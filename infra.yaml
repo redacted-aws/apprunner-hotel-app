@@ -388,7 +388,7 @@ Resources:
           - Effect: "Allow"
             Principal:
               Service:
-                - apprunner.amazonaws.com
+                - tasks.apprunner.amazonaws.com
             Action:
               - "sts:AssumeRole"
       Policies:

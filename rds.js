@@ -13,6 +13,7 @@ var client = new AWS.SecretsManager({
 });
 
 var rdsPool = ""
+var rdsUrl = ""
 
 client.getSecretValue({SecretId: secretName}, function(err, data) {
     if (err) {
@@ -48,6 +49,8 @@ client.getSecretValue({SecretId: secretName}, function(err, data) {
         }
     }
 
+    rdsUrl = secret.host;
+    
     // mysql connection pool
     rdsPool = mysql.createPool({
         connectionLimit : 12,
