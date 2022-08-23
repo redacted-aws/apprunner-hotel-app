@@ -6,7 +6,8 @@ var rds=require('../rds');
 router.post('/', function (req, res, next) {
   if (req.body.roomNumber && req.body.floorNumber && req.body.hasView) {
     console.log('New room request received. roomNumber: %s, floorNumber: %s, hasView: %s', req.body.roomNumber, req.body.floorNumber, req.body.hasView);
-    rds.pool.getConnection(function(err, con){
+    const [pool, url] = rds();
+    pool.getConnection(function(err, con){
       con.release();
       if (err) throw err;
 

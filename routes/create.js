@@ -3,7 +3,8 @@ var router = express.Router();
 var rds=require('../rds');
 
 router.get('/', function(req, res, next) {
-  rds.pool.getConnection(function(err, con){
+  const [pool, rdsUrl] = rds();
+  pool.getConnection(function(err, con){
     if (err) throw err;
 
     console.log("Create table in database if not exists!");
