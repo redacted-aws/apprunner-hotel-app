@@ -45,17 +45,18 @@ client.getSecretValue({SecretId: secretName}, function(err, data) {
             decodedBinarySecret = buff.toString('ascii');
         }
     }
-    console.log(secret)
+    console.log(JSON.parse(secret))
 });
 
-var rdsUrl = secret.host;
+var parsedSecret = JSON.parse(secret)
+var rdsUrl = parsedSecret.host;
     
 // mysql connection pool
 var rdsPool = mysql.createPool({
     connectionLimit : 12,
-    host: secret.host,
-    password: secret.password,
-    user: secret.username
+    host: parsedSecret.host,
+    password: parsedSecret.password,
+    user: parsedSecret.username
 });
 
 module.exports.pool = rdsPool;
