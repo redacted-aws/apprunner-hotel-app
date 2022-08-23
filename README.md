@@ -15,6 +15,8 @@ This project provisions the base layer infrastructure to demonstrate how AppRunn
 
 ## Deployment Instructions
 
+*Note: Use us-east-1 only*
+
 - Create a Cloudformation stack using *infra.yaml*  
 - Deploy the application using the AppRunner Console.
   - Source
