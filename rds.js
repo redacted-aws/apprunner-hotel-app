@@ -12,9 +12,6 @@ var client = new AWS.SecretsManager({
     region: 'us-east-1'
 });
 
-var rdsPool = ""
-var rdsUrl = ""
-
 client.getSecretValue({SecretId: secretName}, function(err, data) {
     if (err) {
         if (err.code === 'DecryptionFailureException')
@@ -48,18 +45,18 @@ client.getSecretValue({SecretId: secretName}, function(err, data) {
             decodedBinarySecret = buff.toString('ascii');
         }
     }
-
-    rdsUrl = secret.host;
-    
-    // mysql connection pool
-    rdsPool = mysql.createPool({
-        connectionLimit : 12,
-        host: secret.host,
-        password: secret.password,
-        user: secret.username
-    });
+    console.log(secret)
 });
 
+var rdsUrl = secret.host;
+    
+// mysql connection pool
+var rdsPool = mysql.createPool({
+    connectionLimit : 12,
+    host: secret.host,
+    password: secret.password,
+    user: secret.username
+});
 
 module.exports.pool = rdsPool;
 module.exports.url = rdsUrl;
