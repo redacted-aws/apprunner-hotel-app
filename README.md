@@ -34,7 +34,10 @@ This project provisions the base layer infrastructure to demonstrate how AppRunn
       - Custom VPC: *AppRunnerV2NPrototype-RDS-Connector* (Provisioned by infra.yaml)
     - Observability: Enable Tracing with AWS X-Ray
 
+## Teardown Instructions
 
+- Go to AppRunner console and delete the service.
+- Go to Cloudformation and delete the stack.
 
 ## Notes
 
