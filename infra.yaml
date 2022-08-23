@@ -7,7 +7,9 @@
 #   * [Network] A NAT Gateway (with routes to it from the priavte subnets)
 #   * [Network] A Security Group for the AppRunner service (allows egress traffic to the RDS database security group)
 #   * [Network] A Security Group for the RDS database (allows ingress traffic from the AppRunner service security group)
+#   * [Network] A Security Group for the Secrets Manager rotation Lambda to connect to RDS
 #   * [RDS] A private RDS Aurora database
+#   * [RDS] Store username/password in Secrets Manager with rotation enabled
 #   * [AppRunner] ECR Access Role (if using a public ECR image, you don't need this role, but creating it anyway)
 #   * [AppRunner] SLR stand-in role (our public SLR policy hasn't been updated yet, so using this manually created role as a stand-in)
 #   * [AppRunner] VPC Connector between AppRunner service and RDS database
@@ -378,10 +380,10 @@ Resources:
       ManagedPolicyArns: 
         - "arn:aws:iam::aws:policy/service-role/AWSAppRunnerServicePolicyForECRAccess"
 
-  AppRunnerSLRStandInRole: 
+  AppRunnerInstanceRole: 
     Type: AWS::IAM::Role
     Properties: 
-      RoleName: "vpc_egress_slr_role"
+      RoleName: "AppRunnerV2NInstanceRole"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement: 
@@ -436,3 +438,5 @@ Resources:
                Action:
                  - "secretsmanager:GetSecretValue"
                Resource: !Ref AuroraDBSecret
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"

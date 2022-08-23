@@ -43,4 +43,4 @@ tracerProvider.register({
   propagator: new AWSXRayPropagator()
 });
 
-module.exports = trace.getTracer("hotel-app-test");
+module.exports = trace.getTracer("AppRunner-Demo");
