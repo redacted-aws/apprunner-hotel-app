@@ -284,6 +284,7 @@ Resources:
       Subnets: 
         - !Ref PrivateSubnet1
         - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
       VpcConnectorName: AppRunnerV2NPrototype-RDS-Connector
 
   DBSubnetGroup:
@@ -293,6 +294,7 @@ Resources:
       SubnetIds: 
         - !Ref PrivateSubnet1
         - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
 
   AuroraDBSecret:
     Type: AWS::SecretsManager::Secret
@@ -331,6 +333,7 @@ Resources:
           - ","
           - - Ref: PrivateSubnet1
             - Ref: PrivateSubnet2
+            - Ref: PrivateSubnet3
       RotationRules:
         Duration: 2h
         ScheduleExpression: 'cron(0 8 1 * ? *)'
