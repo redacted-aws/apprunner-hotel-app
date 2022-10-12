@@ -13,7 +13,8 @@ router.post('/', function (req, res, next) {
 
       con.query(`INSERT INTO hotel.rooms (id, floor, hasView) VALUES ('${req.body.roomNumber}', '${req.body.floorNumber}', '${req.body.hasView}')`, function(err, result, fields) {
           if (err) res.send(err);
-          if (result) res.send({roomId: req.body.roomNumber, floor: req.body.floorNumber, hasView: req.body.hasView});
+          //if (result) res.send({roomId: req.body.roomNumber, floor: req.body.floorNumber, hasView: req.body.hasView});
+          if (result) res.render('add', { title: 'Add new room', view: 'No', result: { roomId: req.body.roomNumber } });
           if (fields) console.log(fields);
       });
     });
