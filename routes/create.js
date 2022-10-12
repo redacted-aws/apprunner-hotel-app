@@ -27,7 +27,7 @@ router.get('/', function(req, res, next) {
     con.release();
   });
 
-  res.render('create');
+  res.render('create', { url: rdsUrl });
 });
 
 module.exports = router;
