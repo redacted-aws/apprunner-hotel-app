@@ -27,7 +27,7 @@ router.get('/', function(req, res, next) {
     con.release();
   });
 
-  res.send('Create completed.');
+  res.render('create');
 });
 
 module.exports = router;
