@@ -4,7 +4,7 @@
 const { trace } = require('@opentelemetry/api');
 
 // OTel JS - Core
-const { WebTracerProvider } = require('@opentelemetry/sdk-trace-web');
+const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
 const { ConsoleSpanExporter, BatchSpanProcessor } = require("@opentelemetry/sdk-trace-base");
 
 // OTel JS - Core - Exporters
@@ -21,7 +21,6 @@ const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventi
 const { AWSXRayIdGenerator } = require('@opentelemetry/id-generator-aws-xray');
 const { AWSXRayPropagator } = require('@opentelemetry/propagator-aws-xray');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
-
 
 registerInstrumentations({
   instrumentations: [
@@ -41,7 +40,7 @@ const resource =
     })
   );
 
-const tracerProvider = new WebTracerProvider({
+const tracerProvider = new NodeTracerProvider({
   resource: resource,
   idGenerator: new AWSXRayIdGenerator(),
 });
