@@ -35,7 +35,7 @@ Resources:
       VpcId: !Ref AppRunnerV2NPrototypeVPC
       AvailabilityZone: us-east-1a
       CidrBlock: 172.31.0.0/24
-      MapPublicIpOnLaunch: true
+      MapPublicIpOnLaunch: false
       Tags: 
         - Key: "Name"
           Value: "AppRunnerV2NPrototype-PublicSubnet-1a"
@@ -46,7 +46,7 @@ Resources:
       VpcId: !Ref AppRunnerV2NPrototypeVPC
       AvailabilityZone: us-east-1b
       CidrBlock: 172.31.1.0/24
-      MapPublicIpOnLaunch: true
+      MapPublicIpOnLaunch: false
       Tags: 
         - Key: "Name"
           Value: "AppRunnerV2NPrototype-PublicSubnet-1b"
@@ -57,7 +57,7 @@ Resources:
       VpcId: !Ref AppRunnerV2NPrototypeVPC
       AvailabilityZone: us-east-1c
       CidrBlock: 172.31.2.0/24
-      MapPublicIpOnLaunch: true
+      MapPublicIpOnLaunch: false
       Tags: 
         - Key: "Name"
           Value: "AppRunnerV2NPrototype-PublicSubnet-1c"
@@ -193,7 +193,7 @@ Resources:
   AppRunnerServiceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow egress traffic to RDS database
+      GroupDescription: Allow egress traffic from AppRunner Service via VPC Connector
       GroupName: AppRunnerV2NPrototype-Service-SG
       VpcId: !Ref AppRunnerV2NPrototypeVPC
       Tags: 
@@ -210,6 +210,15 @@ Resources:
         - Key: "Name"
           Value: "AppRunnerV2NPrototype-RDS-SG"
   
+  RDSSecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !Ref RDSSecurityGroup
+      Description: Allow all outbound traffic
+      IpProtocol: "-1"
+      CidrIp: 0.0.0.0/0
+
+  
   SecretRotationLambdaSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -224,6 +233,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
       GroupId: !Ref RDSSecurityGroup
+      Description: Allow inbound traffic to the DB from AppRunner
       IpProtocol: "tcp"
       FromPort: 3306
       ToPort: 3306
@@ -234,6 +244,7 @@ Resources:
     DependsOn: RDSSecurityGroup
     Properties:
       GroupId: !Ref RDSSecurityGroup
+      Description: Allow inbound traffic to the DB from Secrets Manager rotation Lambda
       IpProtocol: tcp
       FromPort: 3306
       ToPort: 3306
@@ -243,6 +254,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
       GroupId: !Ref AppRunnerServiceSecurityGroup
+      Description: Allow all outbound traffic
       IpProtocol: "-1"
       CidrIp: 0.0.0.0/0
 
