@@ -14,7 +14,7 @@ let rdsUrl = null;
 
 secretsManagerClient.send(new GetSecretValueCommand(params), async (err, data) => {
     if (err) {
-        reject(err);
+        throw(err);
     }
     else {
         const secret = await JSON.parse(data.SecretString);

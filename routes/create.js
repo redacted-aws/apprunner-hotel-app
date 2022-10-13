@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var rds=require('../rds');
+var rds = require('../rds');
 
 router.get('/', function(req, res, next) {
   const [pool, rdsUrl] = rds();
