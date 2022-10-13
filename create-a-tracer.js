@@ -24,7 +24,7 @@ const { AWSXRayPropagator } = require('@opentelemetry/propagator-aws-xray');
 
 // Debug Logging
 const { DiagConsoleLogger, DiagLogLevel, diag } = require('@opentelemetry/api');
-diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);
+diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
 // create a provider using the AWS ID Generator
 const tracerConfig = {
