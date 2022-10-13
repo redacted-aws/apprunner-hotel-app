@@ -29,6 +29,11 @@ secretsManagerClient.send(new GetSecretValueCommand(params), async (err, data) =
             console.error('Unexpected error on idle client', err);
             process.exit(-1);
         }); 
+
+        rdsPool.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
+            if (error) throw error;
+            console.log('The solution is: ', results[0].solution);
+          });
     }
 });
 
