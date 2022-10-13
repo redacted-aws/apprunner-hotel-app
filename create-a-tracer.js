@@ -24,38 +24,33 @@ const { AWSXRayPropagator } = require('@opentelemetry/propagator-aws-xray');
 
 // Debug Logging
 const { DiagConsoleLogger, DiagLogLevel, diag } = require('@opentelemetry/api');
-diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
+diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);
 
-module.exports = (serviceName) => {
-  // create a provider using the AWS ID Generator
-  const tracerConfig = {
-    idGenerator: new AWSXRayIdGenerator(),
-    // any instrumentations can be declared here
-    instrumentations: [
-      new HttpInstrumentation(),
-      new MySQLInstrumentation(),
-      new ExpressInstrumentation(),
-      new AwsInstrumentation({
-        suppressInternalInstrumentation: true
-      }),
-    ],
-    // any resources can be declared here
-    resource: Resource.default().merge(new Resource({
-        [SemanticResourceAttributes.SERVICE_NAME]: serviceName
-    }))
-  };
+// create a provider using the AWS ID Generator
+const tracerConfig = {
+  idGenerator: new AWSXRayIdGenerator(),
+  // any instrumentations can be declared here
+  instrumentations: [
+    new HttpInstrumentation(),
+    new MySQLInstrumentation(),
+    new ExpressInstrumentation(),
+    new AwsInstrumentation({
+      suppressInternalInstrumentation: true
+    }),
+  ],
+  // any resources can be declared here
+  resource: Resource.default().merge(new Resource({
+      [SemanticResourceAttributes.SERVICE_NAME]: 'apprunner-hotel-demo'
+  }))
+};
 
-  const tracerProvider = new NodeTracerProvider(tracerConfig);
+const tracerProvider = new NodeTracerProvider(tracerConfig);
 
-  // add OTLP exporter
-  const otlpExporter = new OTLPTraceExporter();
-  tracerProvider.addSpanProcessor(new SimpleSpanProcessor(otlpExporter));
+// add OTLP exporter
+const otlpExporter = new OTLPTraceExporter();
+tracerProvider.addSpanProcessor(new SimpleSpanProcessor(otlpExporter));
 
-  // Register the tracer provider with an X-Ray propagator
-  tracerProvider.register({
-    propagator: new AWSXRayPropagator()
-  });
-
-  // Return an tracer instance
-  return trace.getTracer("apprunner-hotel-app");
-}
+// Register the tracer provider with an X-Ray propagator
+tracerProvider.register({
+  propagator: new AWSXRayPropagator()
+});
