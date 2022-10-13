@@ -1,18 +1,20 @@
 #
 # This template will create:
 #   * [Network] A VPC 
-#   * [Network] Two Public Subnets (in 2 arbitrary AZs)
-#   * [Network] Six Private Subnets (in all 6 IAD AZs)
+#   * [Network] Two Public Subnets (in 3 IAD AZs)
+#   * [Network] Six Private Subnets (in 3 IAD AZs)
 #   * [Network] An Internet Gateway (with routes to it from the public subnets)
 #   * [Network] A NAT Gateway (with routes to it from the priavte subnets)
-#   * [Network] A Security Group for the AppRunner service (allows egress traffic to the RDS database security group)
-#   * [Network] A Security Group for the RDS database (allows ingress traffic from the AppRunner service security group)
+#   * [Network] A VPC endpoint for AWS Secrets Manager (for private connection between VPC and Secrets Manager)
+#   * [Network] A Security Group for the App Runner service (allows egress traffic to the RDS database security group)
+#   * [Network] A Security Group for the RDS database (allows ingress traffic from the App Runner service security group)
+#   * [Network] A Security Group for the Secrets Manager VPC Endpoint (allows ingress traffic from the App Runner security group)
 #   * [Network] A Security Group for the Secrets Manager rotation Lambda to connect to RDS
 #   * [RDS] A private RDS Aurora database
 #   * [RDS] Store username/password in Secrets Manager with rotation enabled
-#   * [AppRunner] ECR Access Role (if using a public ECR image, you don't need this role, but creating it anyway)
-#   * [AppRunner] SLR stand-in role (our public SLR policy hasn't been updated yet, so using this manually created role as a stand-in)
-#   * [AppRunner] VPC Connector between AppRunner service and RDS database
+#   * [App Runner] ECR Access Role (if using a public ECR image, you don't need this role, but creating it anyway)
+#   * [App Runner] SLR stand-in role (our public SLR policy hasn't been updated yet, so using this manually created role as a stand-in)
+#   * [App Runner] VPC Connector between App Runner service and RDS database
 
 Transform: AWS::SecretsManager-2020-07-23
 
@@ -21,6 +23,8 @@ Resources:
     Type: 'AWS::EC2::VPC'
     Properties:
       CidrBlock: 172.31.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
       Tags: 
         - Key: "Name"
           Value: "AppRunnerV2NPrototypeVPC"
@@ -29,19 +33,30 @@ Resources:
     Type: 'AWS::EC2::Subnet'
     Properties:
       VpcId: !Ref AppRunnerV2NPrototypeVPC
-      AvailabilityZone: us-east-1b
+      AvailabilityZone: us-east-1a
       CidrBlock: 172.31.0.0/24
       MapPublicIpOnLaunch: true
       Tags: 
         - Key: "Name"
-          Value: "AppRunnerV2NPrototype-PublicSubnet-1b"
+          Value: "AppRunnerV2NPrototype-PublicSubnet-1a"
  
   PublicSubnet2:
     Type: 'AWS::EC2::Subnet'
     Properties:
       VpcId: !Ref AppRunnerV2NPrototypeVPC
-      AvailabilityZone: us-east-1c
+      AvailabilityZone: us-east-1b
       CidrBlock: 172.31.1.0/24
+      MapPublicIpOnLaunch: true
+      Tags: 
+        - Key: "Name"
+          Value: "AppRunnerV2NPrototype-PublicSubnet-1b"
+  
+  PublicSubnet3:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref AppRunnerV2NPrototypeVPC
+      AvailabilityZone: us-east-1c
+      CidrBlock: 172.31.2.0/24
       MapPublicIpOnLaunch: true
       Tags: 
         - Key: "Name"
@@ -52,7 +67,7 @@ Resources:
     Properties:
       VpcId: !Ref AppRunnerV2NPrototypeVPC
       AvailabilityZone: us-east-1a
-      CidrBlock: 172.31.2.0/24
+      CidrBlock: 172.31.3.0/24
       MapPublicIpOnLaunch: false
       Tags: 
         - Key: "Name"
@@ -63,7 +78,7 @@ Resources:
     Properties:
       VpcId: !Ref AppRunnerV2NPrototypeVPC
       AvailabilityZone: us-east-1b
-      CidrBlock: 172.31.3.0/24
+      CidrBlock: 172.31.4.0/24
       MapPublicIpOnLaunch: false  
       Tags: 
         - Key: "Name"
@@ -74,44 +89,11 @@ Resources:
     Properties:
       VpcId: !Ref AppRunnerV2NPrototypeVPC
       AvailabilityZone: us-east-1c
-      CidrBlock: 172.31.4.0/24
-      MapPublicIpOnLaunch: false  
-      Tags: 
-        - Key: "Name"
-          Value: "AppRunnerV2NPrototype-PrivateSubnet-1c"
-  
-  PrivateSubnet4:
-    Type: 'AWS::EC2::Subnet'
-    Properties:
-      VpcId: !Ref AppRunnerV2NPrototypeVPC
-      AvailabilityZone: us-east-1d
       CidrBlock: 172.31.5.0/24
       MapPublicIpOnLaunch: false  
       Tags: 
         - Key: "Name"
-          Value: "AppRunnerV2NPrototype-PrivateSubnet-1d"
-  
-  PrivateSubnet5:
-    Type: 'AWS::EC2::Subnet'
-    Properties:
-      VpcId: !Ref AppRunnerV2NPrototypeVPC
-      AvailabilityZone: us-east-1e
-      CidrBlock: 172.31.6.0/24
-      MapPublicIpOnLaunch: false  
-      Tags: 
-        - Key: "Name"
-          Value: "AppRunnerV2NPrototype-PrivateSubnet-1e"
-  
-  PrivateSubnet6:
-    Type: 'AWS::EC2::Subnet'
-    Properties:
-      VpcId: !Ref AppRunnerV2NPrototypeVPC
-      AvailabilityZone: us-east-1f
-      CidrBlock: 172.31.7.0/24
-      MapPublicIpOnLaunch: false  
-      Tags: 
-        - Key: "Name"
-          Value: "AppRunnerV2NPrototype-PrivateSubnet-1f"
+          Value: "AppRunnerV2NPrototype-PrivateSubnet-1c"
 
   InternetGateway:
     Type: 'AWS::EC2::InternetGateway'
@@ -154,6 +136,12 @@ Resources:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
       SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnet3RouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PublicSubnet3
       RouteTableId: !Ref PublicRouteTable
 
   NatGateway:
@@ -202,24 +190,6 @@ Resources:
       SubnetId: !Ref PrivateSubnet3
       RouteTableId: !Ref PrivateRouteTable
 
-  PrivateSubnet4RouteTableAssociation:
-    Type: 'AWS::EC2::SubnetRouteTableAssociation'
-    Properties:
-      SubnetId: !Ref PrivateSubnet4
-      RouteTableId: !Ref PrivateRouteTable
-
-  PrivateSubnet5RouteTableAssociation:
-    Type: 'AWS::EC2::SubnetRouteTableAssociation'
-    Properties:
-      SubnetId: !Ref PrivateSubnet5
-      RouteTableId: !Ref PrivateRouteTable
-
-  PrivateSubnet6RouteTableAssociation:
-    Type: 'AWS::EC2::SubnetRouteTableAssociation'
-    Properties:
-      SubnetId: !Ref PrivateSubnet6
-      RouteTableId: !Ref PrivateRouteTable
-
   AppRunnerServiceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -239,15 +209,6 @@ Resources:
       Tags: 
         - Key: "Name"
           Value: "AppRunnerV2NPrototype-RDS-SG"
-  
-  AppRunnerServiceSecurityGroupEgressToRDSSecurityGroup:
-    Type: AWS::EC2::SecurityGroupEgress
-    Properties:
-      GroupId: !Ref AppRunnerServiceSecurityGroup
-      IpProtocol: "tcp"
-      FromPort: 3306
-      ToPort: 3306
-      DestinationSecurityGroupId: !Ref RDSSecurityGroup
   
   SecretRotationLambdaSecurityGroup:
     Type: AWS::EC2::SecurityGroup
