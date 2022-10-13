@@ -1,2 +1,0 @@
-base = {workspace = yimipeng_hotel-app-local; };
-packages = { };
