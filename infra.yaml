@@ -228,7 +228,7 @@ Resources:
       VpcId: !Ref AppRunnerV2NPrototypeVPC
       Tags: 
         - Key: "Name"
-          Value: "AppRunnerV2NPrototype-App-SG"
+          Value: "AppRunnerV2NPrototype-Service-SG"
   
   RDSSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -239,6 +239,15 @@ Resources:
       Tags: 
         - Key: "Name"
           Value: "AppRunnerV2NPrototype-RDS-SG"
+  
+  AppRunnerServiceSecurityGroupEgressToRDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !Ref AppRunnerServiceSecurityGroup
+      IpProtocol: "tcp"
+      FromPort: 3306
+      ToPort: 3306
+      DestinationSecurityGroupId: !Ref RDSSecurityGroup
   
   SecretRotationLambdaSecurityGroup:
     Type: AWS::EC2::SecurityGroup
