@@ -18,7 +18,6 @@ secretsManagerClient.send(new GetSecretValueCommand(params), async (err, data) =
     }
     else {
         const secret = await JSON.parse(data.SecretString);
-        console.log("secret", secret)
         rdsUrl = secret.host;
         rdsPool = mysql.createPool({
             connectionLimit : 12,

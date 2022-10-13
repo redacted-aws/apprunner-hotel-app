@@ -8,10 +8,10 @@ router.post('/', function (req, res, next) {
     console.log('New room request received. roomNumber: %s, floorNumber: %s, hasView: %s', req.body.roomNumber, req.body.floorNumber, req.body.hasView);
     const [pool, url] = rds();
     pool.getConnection(function(err, con){
-      con.release();
       if (err) throw err;
 
       con.query(`INSERT INTO hotel.rooms (id, floor, hasView) VALUES ('${req.body.roomNumber}', '${req.body.floorNumber}', '${req.body.hasView}')`, function(err, result, fields) {
+          con.release();
           if (err) res.send(err);
           //if (result) res.send({roomId: req.body.roomNumber, floor: req.body.floorNumber, hasView: req.body.hasView});
           if (result) res.render('add', { title: 'Add new room', view: 'No', result: { roomId: req.body.roomNumber } });
