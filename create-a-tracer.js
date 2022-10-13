@@ -8,12 +8,12 @@ const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
 const { SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 
 // OTel JS - Core - Exporters
-const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector-grpc');
+const { CollectorTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc');
 
 // OTel JS - Core - Instrumentations
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
 const { MySQLInstrumentation } = require('@opentelemetry/instrumentation-mysql');
-const { AwsInstrumentation } = require('opentelemetry-instrumentation-aws-sdk');
+const { AwsInstrumentation } = require('opentelemetry/instrumentation-aws-sdk');
 const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions')
 
