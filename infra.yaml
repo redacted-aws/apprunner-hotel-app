@@ -1,8 +1,8 @@
 #
 # This template will create:
 #   * [Network] A VPC 
-#   * [Network] Two Public Subnets (in 3 IAD AZs)
-#   * [Network] Six Private Subnets (in 3 IAD AZs)
+#   * [Network] Three Public Subnets (in 3 IAD AZs)
+#   * [Network] Three Private Subnets (in 3 IAD AZs)
 #   * [Network] An Internet Gateway (with routes to it from the public subnets)
 #   * [Network] A NAT Gateway (with routes to it from the priavte subnets)
 #   * [Network] A VPC endpoint for AWS Secrets Manager (for private connection between VPC and Secrets Manager)
