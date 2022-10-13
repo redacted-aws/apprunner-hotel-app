@@ -1,5 +1,3 @@
-'use strict'
-
 // OTel JS - API
 const { trace } = require('@opentelemetry/api');
 
@@ -15,7 +13,7 @@ const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
 const { MySQLInstrumentation } = require('@opentelemetry/instrumentation-mysql');
 const { AwsInstrumentation } = require('@opentelemetry/instrumentation-aws-sdk');
 const { ExpressInstrumentation } = require('@opentelemetry/instrumentation-express');
-const { Resource } = require('@opentelemetry/resources');
+const { Resource } = require( '@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
@@ -24,37 +22,36 @@ const { AWSXRayIdGenerator } = require('@opentelemetry/id-generator-aws-xray');
 const { AWSXRayPropagator } = require('@opentelemetry/propagator-aws-xray');
 
 
-registerInstrumentations({
-  instrumentations: [
-    new HttpInstrumentation(),
-    new MySQLInstrumentation(),
-    new ExpressInstrumentation(),
-    new AwsInstrumentation({
-      suppressInternalInstrumentation: true
-    }),
-  ]
-});
+module.exports = (serviceName) => {
+  // create a provider using the AWS ID Generator
+  const tracerConfig = {
+    idGenerator: new AWSXRayIdGenerator(),
+    // any instrumentations can be declared here
+    instrumentations: [
+      new HttpInstrumentation(),
+      new MySQLInstrumentation(),
+      new ExpressInstrumentation(),
+      new AwsInstrumentation({
+        suppressInternalInstrumentation: true
+      }),
+    ],
+    // any resources can be declared here
+    resource: Resource.default().merge(new Resource({
+        [SemanticResourceAttributes.SERVICE_NAME]: serviceName
+    }))
+  };
 
-const resource =
-  Resource.default().merge(
-    new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: "apprunner-hotel-app",
-      [SemanticResourceAttributes.SERVICE_VERSION]: "3.0.0",
-    })
-  );
+  const tracerProvider = new NodeTracerProvider(tracerConfig);
 
-const tracerProvider = new NodeTracerProvider({
-  resource: resource,
-  idGenerator: new AWSXRayIdGenerator(),
-});
+  // add OTLP exporter
+  const otlpExporter = new OTLPTraceExporter();
+  tracerProvider.addSpanProcessor(new BatchSpanProcessor(otlpExporter));
 
-// Expects Collector at env variable `OTEL_EXPORTER_OTLP_ENDPOINT`, otherwise, http://localhost:4317
-const exporter = new OTLPTraceExporter();
-const processor = new BatchSpanProcessor(exporter);
+  // Register the tracer provider with an X-Ray propagator
+  tracerProvider.register({
+    propagator: new AWSXRayPropagator()
+  });
 
-tracerProvider.addSpanProcessor(processor);
-tracerProvider.register({
-  propagator: new AWSXRayPropagator()
-});
-
-module.exports = trace.getTracer("AppRunner-V2N-Demo");
+  // Return an tracer instance
+  return trace.getTracer("apprunner-hotel-app");
+}

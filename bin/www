@@ -5,7 +5,6 @@
  */
 
 var app = require('../app');
-var tracer = require('../create-a-tracer');
 var debug = require('debug')('apprunner-example-2:server');
 var http = require('http');
 
