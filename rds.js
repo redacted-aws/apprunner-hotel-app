@@ -1,10 +1,11 @@
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager');
 var mysql = require('mysql');
-var https = require('https');
+var http = require('http');
 
 const task_metadata_endpoint = process.env.ECS_CONTAINER_METADATA_URI_V4;
+console.log('Endpoint: ', task_metadata_endpoint);
 
-https.get(task_metadata_endpoint, res => {
+http.get(task_metadata_endpoint, res => {
   let data = [];
   console.log('Status Code:', res.statusCode);
 
