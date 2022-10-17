@@ -2,12 +2,13 @@ const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client
 var mysql = require('mysql');
 var http = require('http');
 
-const task_metadata_endpoint = process.env.ECS_CONTAINER_METADATA_URI_V4;
+const task_metadata_endpoint = process.env.ECS_CONTAINER_METADATA_URI_V4 + '/task/';
 console.log('Endpoint: ', task_metadata_endpoint);
 
+var REGION = ''
 http.get(task_metadata_endpoint, res => {
   let data = [];
-  console.log('Status Code:', res.statusCode);
+  console.log('Endpoint Response Status Code:', res.statusCode);
 
   res.on('data', chunk => {
     data.push(chunk);
@@ -16,15 +17,16 @@ http.get(task_metadata_endpoint, res => {
   res.on('end', () => {
     console.log('Response ended: ');
     const metadata = JSON.parse(Buffer.concat(data).toString());
-
-    console.log(metadata)
+    const az = metadata.AvailabilityZone
+    console.log('Task Running in: ', az);
+    REGION = az.slice(0,-1);
   });
 }).on('error', err => {
   console.log('Error: ', err.message);
 });
 
 const secretsManagerClient = new SecretsManagerClient({
-  region: 'us-east-1'
+  region: REGION
 });
   
 const params = {
