@@ -4,6 +4,7 @@ const mysql = require('mysql');
 var rdsPool = null;
 var rdsUrl = null;
 
+// AWS_REGION is available as a default environment variable
 const region = process.env.AWS_REGION;
 console.log('Application launched in: ', region);
 
