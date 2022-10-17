@@ -2,7 +2,7 @@ const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client
 var mysql = require('mysql');
 var http = require('http');
 
-const task_metadata_endpoint = process.env.ECS_CONTAINER_METADATA_URI_V4 + '/task/';
+const task_metadata_endpoint = process.env.ECS_CONTAINER_METADATA_URI_V4 + '/task';
 console.log('Endpoint: ', task_metadata_endpoint);
 
 var REGION = ''
