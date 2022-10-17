@@ -1,5 +1,26 @@
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager');
 var mysql = require('mysql');
+var https = require('https');
+
+const task_metadata_endpoint = process.env.ECS_CONTAINER_METADATA_URI_V4;
+
+https.get(task_metadata_endpoint, res => {
+  let data = [];
+  console.log('Status Code:', res.statusCode);
+
+  res.on('data', chunk => {
+    data.push(chunk);
+  });
+
+  res.on('end', () => {
+    console.log('Response ended: ');
+    const metadata = JSON.parse(Buffer.concat(data).toString());
+
+    console.log(metadata)
+  });
+}).on('error', err => {
+  console.log('Error: ', err.message);
+});
 
 const secretsManagerClient = new SecretsManagerClient({
   region: 'us-east-1'
