@@ -26,7 +26,7 @@ http.get(task_metadata_endpoint, res => {
 });
 
 const secretsManagerClient = new SecretsManagerClient({
-  region: REGION
+  //region: REGION
 });
   
 const params = {
