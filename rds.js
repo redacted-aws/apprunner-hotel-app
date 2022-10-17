@@ -1,40 +1,19 @@
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager');
-var mysql = require('mysql');
-var http = require('http');
+const mysql = require('mysql');
 
-const task_metadata_endpoint = process.env.ECS_CONTAINER_METADATA_URI_V4 + '/task';
-console.log('Endpoint: ', task_metadata_endpoint);
+var rdsPool = null;
+var rdsUrl = null;
 
-var REGION = ''
-http.get(task_metadata_endpoint, res => {
-  let data = [];
-  console.log('Endpoint Response Status Code:', res.statusCode);
-
-  res.on('data', chunk => {
-    data.push(chunk);
-  });
-
-  res.on('end', () => {
-    console.log('Response ended: ');
-    const metadata = JSON.parse(Buffer.concat(data).toString());
-    const az = metadata.AvailabilityZone
-    console.log('Task Running in: ', az);
-    REGION = az.slice(0,-1);
-  });
-}).on('error', err => {
-  console.log('Error: ', err.message);
-});
+const region = process.env.AWS_REGION;
+console.log('Application launched in: ', region);
 
 const secretsManagerClient = new SecretsManagerClient({
-  //region: REGION
+  region: region
 });
   
 const params = {
   SecretId: process.env.secret
 }
-
-let rdsPool = null;
-let rdsUrl = null;
 
 secretsManagerClient.send(new GetSecretValueCommand(params), async (err, data) => {
     if (err) {
