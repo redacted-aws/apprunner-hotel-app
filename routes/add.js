@@ -24,9 +24,9 @@ var rds=require('../rds');
 router.post('/', function (req, res, next) {
   if (req.body.roomNumber && req.body.floorNumber && req.body.hasView) {
     
-    const { roomNumber } = req.body.roomNumber;
-    const { floorNumber } = req.body.floorNumber;
-    const { hasView } = req.body.hasView;
+    const roomNumber = req.body.roomNumber;
+    const floorNumber = req.body.floorNumber;
+    const hasView = req.body.hasView;
 
     console.log('New room request received. roomNumber: %s, floorNumber: %s, hasView: %s', roomNumber, floorNumber, hasView);
     
